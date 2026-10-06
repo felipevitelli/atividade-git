@@ -25,8 +25,13 @@ def adicionar(titulo):
     print(f"Tarefa '{titulo}' adicionada.")
 
 
-def listar_tarefas():
-    for t in carregar():
+def listar_tarefas(status=None):
+    tarefas = carregar()
+    if status == "pendentes":
+        tarefas = [t for t in tarefas if not t["concluida"]]
+    elif status == "concluidas":
+        tarefas = [t for t in tarefas if t["concluida"]]
+    for t in tarefas:
         marca = "x" if t["concluida"] else " "
         print(f"[{marca}] {t['id']} - {t['titulo']}")
 
@@ -49,7 +54,8 @@ def main():
     p_add = sub.add_parser("add", help="adiciona uma tarefa")
     p_add.add_argument("titulo")
 
-    sub.add_parser("list", help="lista as tarefas")
+    p_list = sub.add_parser("list", help="lista as tarefas")
+    p_list.add_argument("--status", choices=["pendentes", "concluidas"])
 
     p_done = sub.add_parser("done", help="conclui uma tarefa")
     p_done.add_argument("id", type=int)
@@ -58,7 +64,7 @@ def main():
     if args.cmd == "add":
         adicionar(args.titulo)
     elif args.cmd == "list":
-        listar_tarefas()
+        listar_tarefas(args.status)
     elif args.cmd == "done":
         concluir(args.id)
 
