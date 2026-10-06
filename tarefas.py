@@ -18,17 +18,19 @@ def salvar(tarefas):
         json.dump(tarefas, f, ensure_ascii=False, indent=2)
 
 
-def adicionar(titulo):
+def adicionar(titulo, prioridade="media"):
     tarefas = carregar()
-    tarefas.append({"id": len(tarefas) + 1, "titulo": titulo, "concluida": False})
+    tarefas.append({"id": len(tarefas) + 1, "titulo": titulo,
+                    "prioridade": prioridade, "concluida": False})
     salvar(tarefas)
     print(f"Tarefa '{titulo}' adicionada.")
 
 
 def listar_tarefas():
-    for t in carregar():
+    ordem = {"alta": 0, "media": 1, "baixa": 2}
+    for t in sorted(carregar(), key=lambda x: ordem.get(x.get("prioridade", "media"), 1)):
         marca = "x" if t["concluida"] else " "
-        print(f"[{marca}] {t['id']} - {t['titulo']}")
+        print(f"[{marca}] {t['id']} - {t['titulo']} ({t.get('prioridade', 'media')})")
 
 
 def concluir(id_tarefa):
@@ -48,6 +50,7 @@ def main():
 
     p_add = sub.add_parser("add", help="adiciona uma tarefa")
     p_add.add_argument("titulo")
+    p_add.add_argument("--prioridade", choices=["alta", "media", "baixa"], default="media")
 
     sub.add_parser("list", help="lista as tarefas")
 
@@ -56,7 +59,7 @@ def main():
 
     args = parser.parse_args()
     if args.cmd == "add":
-        adicionar(args.titulo)
+        adicionar(args.titulo, args.prioridade)
     elif args.cmd == "list":
         listar_tarefas()
     elif args.cmd == "done":
