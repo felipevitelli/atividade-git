@@ -26,9 +26,14 @@ def adicionar(titulo, prioridade="media"):
     print(f"Tarefa '{titulo}' adicionada.")
 
 
-def listar_tarefas():
+def listar_tarefas(status=None):
+    tarefas = carregar()
+    if status == "pendentes":
+        tarefas = [t for t in tarefas if not t["concluida"]]
+    elif status == "concluidas":
+        tarefas = [t for t in tarefas if t["concluida"]]
     ordem = {"alta": 0, "media": 1, "baixa": 2}
-    for t in sorted(carregar(), key=lambda x: ordem.get(x.get("prioridade", "media"), 1)):
+    for t in sorted(tarefas, key=lambda x: ordem.get(x.get("prioridade", "media"), 1)):
         marca = "x" if t["concluida"] else " "
         print(f"[{marca}] {t['id']} - {t['titulo']} ({t.get('prioridade', 'media')})")
 
@@ -52,7 +57,8 @@ def main():
     p_add.add_argument("titulo")
     p_add.add_argument("--prioridade", choices=["alta", "media", "baixa"], default="media")
 
-    sub.add_parser("list", help="lista as tarefas")
+    p_list = sub.add_parser("list", help="lista as tarefas")
+    p_list.add_argument("--status", choices=["pendentes", "concluidas"])
 
     p_done = sub.add_parser("done", help="conclui uma tarefa")
     p_done.add_argument("id", type=int)
@@ -61,7 +67,7 @@ def main():
     if args.cmd == "add":
         adicionar(args.titulo, args.prioridade)
     elif args.cmd == "list":
-        listar_tarefas()
+        listar_tarefas(args.status)
     elif args.cmd == "done":
         concluir(args.id)
 
