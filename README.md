@@ -4,4 +4,4 @@ Projeto da atividade em sala de Engenharia de Software (Git/GitHub).
 
 ## Uso
 
-python tarefas.py add "estudar git"
+python tarefas.py add "estudar git" --prioridade alta
